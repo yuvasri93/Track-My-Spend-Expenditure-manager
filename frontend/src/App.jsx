@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { GamificationProvider } from './context/GamificationContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
@@ -160,13 +161,15 @@ const AppRoutes = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <GamificationProvider>
-        <Router>
-          <AppRoutes />
-        </Router>
-      </GamificationProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <GamificationProvider>
+          <Router>
+            <AppRoutes />
+          </Router>
+        </GamificationProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

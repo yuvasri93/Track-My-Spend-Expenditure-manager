@@ -130,7 +130,7 @@
 /* Navbar Topbar */
 .navbar {
   height: 68px;
-  background: rgba(11, 15, 25, 0.85);
+  background: var(--bg-glass);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
@@ -201,9 +201,9 @@
 .character-card {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(30, 27, 75, 0.6) 0%, rgba(17, 24, 39, 0.9) 100%);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  box-shadow: 0 10px 30px -10px rgba(124, 58, 237, 0.3);
+  background: var(--char-card-bg);
+  border: 1px solid var(--char-card-border);
+  box-shadow: var(--card-shadow);
 }
 
 .character-card::before {
@@ -309,11 +309,11 @@
 
 .progress-track {
   height: 10px;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--progress-track-bg);
   border-radius: 9999px;
   overflow: hidden;
   position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
 }
 
 .progress-fill {
@@ -436,7 +436,7 @@
 }
 
 .expense-table tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--table-hover-bg);
 }
 
 .expense-amount {

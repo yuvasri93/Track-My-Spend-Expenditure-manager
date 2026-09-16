@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Plus, Flame, Zap, Volume2, VolumeX, Sparkles } from 'lucide-react';
+import { Menu, Plus, Flame, Zap, Volume2, VolumeX, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useGamification } from '../context/GamificationContext';
+import { useTheme } from '../context/ThemeContext';
 
 const Navbar = ({ onToggleSidebar, title = 'Dashboard' }) => {
   const { user } = useAuth();
   const { isMuted, toggleSound } = useGamification();
+  const { isDark, toggleTheme } = useTheme();
 
   return (
     <header className="navbar">
@@ -20,11 +22,30 @@ const Navbar = ({ onToggleSidebar, title = 'Dashboard' }) => {
         </button>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>{title}</h2>
-          <span className="kbd-badge" style={{ display: 'none' }} id="kbd-hint">N</span>
         </div>
       </div>
 
       <div className="navbar-right">
+        {/* Theme Toggle Button (Light/Dark Mode) */}
+        <button
+          onClick={toggleTheme}
+          className="action-btn"
+          title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            background: 'var(--bg-surface)',
+            transition: 'transform 0.2s ease',
+          }}
+        >
+          {isDark ? (
+            <Sun size={17} color="#fbbf24" style={{ filter: 'drop-shadow(0 0 4px #f59e0b)' }} />
+          ) : (
+            <Moon size={17} color="#7c3aed" />
+          )}
+        </button>
+
         {/* Sound FX Toggle Button */}
         <button
           onClick={toggleSound}
