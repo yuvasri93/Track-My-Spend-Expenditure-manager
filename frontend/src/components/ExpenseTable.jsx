@@ -1,12 +1,45 @@
 import React from 'react';
-import { Edit2, Trash2, Calendar, CreditCard, Tag } from 'lucide-react';
+import {
+  Edit2,
+  Trash2,
+  Calendar,
+  CreditCard,
+  Tag,
+  Utensils,
+  Car,
+  GraduationCap,
+  ShoppingBag,
+  Gamepad2,
+  Receipt,
+  HeartPulse,
+  Coins
+} from 'lucide-react';
 import { formatCurrency, formatDate, getCategoryMeta, getPaymentMethodMeta } from '../utils/formatters';
+
+const getCategoryIcon = (iconName) => {
+  switch (iconName) {
+    case 'Utensils': return Utensils;
+    case 'Car': return Car;
+    case 'GraduationCap': return GraduationCap;
+    case 'ShoppingBag': return ShoppingBag;
+    case 'Gamepad2': return Gamepad2;
+    case 'Receipt': return Receipt;
+    case 'HeartPulse': return HeartPulse;
+    default: return Coins;
+  }
+};
 
 const ExpenseTable = ({ expenses = [], onEdit, onDelete, isLoading = false }) => {
   if (isLoading) {
     return (
-      <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-        Loading expenses...
+      <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+        {[1, 2, 3, 4, 5].map((idx) => (
+          <div
+            key={idx}
+            className="skeleton"
+            style={{ height: '48px', width: '100%', borderRadius: 'var(--radius-md)' }}
+          />
+        ))}
       </div>
     );
   }
@@ -22,14 +55,16 @@ const ExpenseTable = ({ expenses = [], onEdit, onDelete, isLoading = false }) =>
           border: '1px dashed var(--border-card)',
         }}
       >
-        <Tag size={40} color="var(--text-muted)" style={{ marginBottom: '1rem' }} />
-        <h4 style={{ marginBottom: '0.5rem', color: 'var(--text-white)' }}>No expenses found</h4>
-        <p style={{ fontSize: '0.875rem', marginBottom: '1.5rem' }}>
-          Record your transactions to start tracking spending and earning XP!
+        <Tag size={42} color="var(--text-muted)" style={{ marginBottom: '0.75rem', opacity: 0.6 }} />
+        <h4 style={{ marginBottom: '0.4rem', color: 'var(--text-white)' }}>No transactions found</h4>
+        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+          Record your first expenditure to begin logging activity and leveling up.
         </p>
       </div>
     );
   }
+
+  const tableTotal = expenses.reduce((sum, item) => sum + Number(item.amount || 0), 0);
 
   return (
     <div className="table-responsive">
@@ -47,14 +82,15 @@ const ExpenseTable = ({ expenses = [], onEdit, onDelete, isLoading = false }) =>
         <tbody>
           {expenses.map((expense) => {
             const catMeta = getCategoryMeta(expense.category);
+            const CatIcon = getCategoryIcon(catMeta.icon);
             const payMeta = getPaymentMethodMeta(expense.payment_method);
 
             return (
               <tr key={expense.id}>
                 <td style={{ whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <Calendar size={14} color="var(--text-muted)" />
-                    <span>{formatDate(expense.date)}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                    <Calendar size={13} color="var(--text-muted)" />
+                    <span style={{ fontSize: '0.85rem' }}>{formatDate(expense.date)}</span>
                   </div>
                 </td>
                 <td>
@@ -76,7 +112,8 @@ const ExpenseTable = ({ expenses = [], onEdit, onDelete, isLoading = false }) =>
                       border: `1px solid ${catMeta.color}33`,
                     }}
                   >
-                    {expense.category}
+                    <CatIcon size={12} />
+                    <span>{expense.category}</span>
                   </span>
                 </td>
                 <td>
@@ -94,16 +131,16 @@ const ExpenseTable = ({ expenses = [], onEdit, onDelete, isLoading = false }) =>
                     <button
                       onClick={() => onEdit(expense)}
                       className="action-btn"
-                      title="Edit expense"
+                      title="Edit expense record"
                     >
-                      <Edit2 size={16} />
+                      <Edit2 size={15} />
                     </button>
                     <button
                       onClick={() => onDelete(expense)}
                       className="action-btn delete"
-                      title="Delete expense"
+                      title="Delete expense record"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={15} />
                     </button>
                   </div>
                 </td>
@@ -111,6 +148,16 @@ const ExpenseTable = ({ expenses = [], onEdit, onDelete, isLoading = false }) =>
             );
           })}
         </tbody>
+        <tfoot>
+          <tr style={{ borderTop: '2px solid var(--border-card)', background: 'rgba(255, 255, 255, 0.02)' }}>
+            <td colSpan={4} style={{ padding: '0.85rem 1rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+              Total for Listed Records ({expenses.length} transactions)
+            </td>
+            <td colSpan={2} style={{ padding: '0.85rem 1rem', fontWeight: 800, fontSize: '1.05rem', color: 'var(--accent-purple-light)' }}>
+              {formatCurrency(tableTotal)}
+            </td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   );

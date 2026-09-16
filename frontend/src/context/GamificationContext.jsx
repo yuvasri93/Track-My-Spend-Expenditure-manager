@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { useAuth } from './AuthContext';
+import { soundFX } from '../utils/audio';
 
 const GamificationContext = createContext(null);
 
@@ -9,12 +10,19 @@ export const GamificationProvider = ({ children }) => {
   const [levelUpData, setLevelUpData] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
   const [newAchievement, setNewAchievement] = useState(null);
+  const [isMuted, setIsMuted] = useState(() => soundFX.isMuted());
+
+  const toggleSound = () => {
+    const next = soundFX.toggleMute();
+    setIsMuted(next);
+    showToast(next ? 'Sound FX muted 🔇' : 'Sound FX active 🔊', 'info');
+  };
 
   const fireConfetti = () => {
     try {
       confetti({
-        particleCount: 100,
-        spread: 70,
+        particleCount: 120,
+        spread: 80,
         origin: { y: 0.6 },
         colors: ['#8b5cf6', '#a855f7', '#ec4899', '#f59e0b', '#10b981'],
       });
@@ -45,19 +53,27 @@ export const GamificationProvider = ({ children }) => {
 
     // Check for level up
     if (gamification.leveled_up) {
+      soundFX.playLevelUp();
       fireConfetti();
       setLevelUpData({
         level: gamification.level,
         rank_title: gamification.rank_title,
       });
+      return;
     }
 
     // Check for new achievements
     if (gamification.unlocked_achievements && gamification.unlocked_achievements.length > 0) {
+      soundFX.playQuestClaim();
       const first = gamification.unlocked_achievements[0];
       setNewAchievement(first);
       fireConfetti();
-    } else if (gamification.xp_awarded) {
+      return;
+    }
+
+    // Standard XP gain
+    if (gamification.xp_awarded) {
+      soundFX.playCoin();
       showToast(`+${gamification.xp_awarded} XP Earned! ⚡`, 'xp');
     }
   };
@@ -75,6 +91,8 @@ export const GamificationProvider = ({ children }) => {
         newAchievement,
         closeAchievementModal,
         toastMessage,
+        isMuted,
+        toggleSound,
       }}
     >
       {children}

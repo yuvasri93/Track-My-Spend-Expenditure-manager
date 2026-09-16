@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Plus, Flame, Zap } from 'lucide-react';
+import { Menu, Plus, Flame, Zap, Volume2, VolumeX, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useGamification } from '../context/GamificationContext';
 
 const Navbar = ({ onToggleSidebar, title = 'Dashboard' }) => {
   const { user } = useAuth();
+  const { isMuted, toggleSound } = useGamification();
 
   return (
     <header className="navbar">
@@ -16,25 +18,49 @@ const Navbar = ({ onToggleSidebar, title = 'Dashboard' }) => {
         >
           <Menu size={22} />
         </button>
-        <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0 }}>{title}</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>{title}</h2>
+          <span className="kbd-badge" style={{ display: 'none' }} id="kbd-hint">N</span>
+        </div>
       </div>
 
       <div className="navbar-right">
+        {/* Sound FX Toggle Button */}
+        <button
+          onClick={toggleSound}
+          className="action-btn"
+          title={isMuted ? 'Unmute RPG Sound Effects' : 'Mute Sound Effects'}
+          style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--bg-surface)' }}
+        >
+          {isMuted ? <VolumeX size={16} color="var(--text-muted)" /> : <Volume2 size={16} color="var(--accent-purple-light)" />}
+        </button>
+
         {user && (
           <>
-            <div className="streak-pill" title="Current Daily Spending Streak">
+            {/* Streak Counter Pill */}
+            <div className="streak-pill" title={`${user.streak_days || 0} consecutive days of spending tracking!`}>
               <Flame size={16} className="streak-flame" />
-              <span>{user.streak_days || 0} Day Streak</span>
+              <span>{user.streak_days || 0}d Streak</span>
             </div>
 
-            <div className="level-badge-nav" title="Current Level & Rank">
+            {/* Level & Rank Pill */}
+            <Link
+              to="/profile"
+              className="level-badge-nav"
+              title={`Level ${user.level || 1}: ${user.rank_title || 'Initiate'} • View Character Dossier`}
+              style={{ textDecoration: 'none' }}
+            >
               <Zap size={15} />
               <span>Lvl {user.level || 1} • {user.rank_title || 'Initiate'}</span>
-            </div>
+            </Link>
           </>
         )}
 
-        <Link to="/add-expense" className="btn btn-primary" style={{ padding: '0.45rem 0.9rem', fontSize: '0.825rem' }}>
+        <Link
+          to="/add-expense"
+          className="btn btn-primary"
+          style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+        >
           <Plus size={16} />
           <span>Add Expense</span>
         </Link>

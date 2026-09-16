@@ -10,6 +10,12 @@ import {
   Plus,
   RefreshCw,
   TrendingDown,
+  Sparkles,
+  Zap,
+  Coffee,
+  ShoppingBag,
+  Bus,
+  Utensils
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useGamification } from '../context/GamificationContext';
@@ -19,13 +25,21 @@ import ExpenseTable from '../components/ExpenseTable';
 import ExpenseModal from '../components/ExpenseModal';
 import { formatCurrency, getCategoryMeta } from '../utils/formatters';
 
+const QUICK_PRESETS = [
+  { desc: 'Coffee / Tea', cat: 'Food', amt: '120.00', method: 'UPI', icon: Coffee },
+  { desc: 'Quick Lunch', cat: 'Food', amt: '250.00', method: 'UPI', icon: Utensils },
+  { desc: 'Metro / Auto Fare', cat: 'Transport', amt: '80.00', method: 'UPI', icon: Bus },
+  { desc: 'Groceries / Snacks', cat: 'Food', amt: '450.00', method: 'Card', icon: ShoppingBag },
+];
+
 const Dashboard = () => {
   const currentMonthStr = new Date().toISOString().slice(0, 7);
   const [selectedMonth, setSelectedMonth] = useState(currentMonthStr);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editingExpense, setEditingExpense] = useState(null);
-  const { showToast } = useGamification();
+  const [quickLogging, setQuickLogging] = useState(false);
+  const { handleGamificationEvent, showToast } = useGamification();
 
   const fetchDashboardStats = async (month) => {
     try {
@@ -63,6 +77,32 @@ const Dashboard = () => {
     fetchDashboardStats(selectedMonth);
   };
 
+  const handleQuickLog = async (preset) => {
+    try {
+      setQuickLogging(true);
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const res = await api.expenses.create({
+        description: preset.desc,
+        category: preset.cat,
+        amount: preset.amt,
+        date: todayStr,
+        payment_method: preset.method,
+        notes: 'Quick-logged from Command Center',
+      });
+
+      if (res.gamification) {
+        handleGamificationEvent(res.gamification);
+      }
+
+      showToast(`Quick Logged "${preset.desc}"! +20 XP ⚡`, 'xp');
+      fetchDashboardStats(selectedMonth);
+    } catch (err) {
+      alert(err.message || 'Failed to quick log.');
+    } finally {
+      setQuickLogging(false);
+    }
+  };
+
   return (
     <div className="dashboard-page">
       {/* Header */}
@@ -74,9 +114,9 @@ const Dashboard = () => {
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
           <div className="month-picker-box">
-            <CalendarDays size={18} color="var(--text-muted)" />
+            <CalendarDays size={17} color="var(--text-muted)" />
             <input
               type="month"
               value={selectedMonth}
@@ -91,15 +131,54 @@ const Dashboard = () => {
             title="Refresh statistics"
             style={{ width: '38px', height: '38px', background: 'var(--bg-surface)' }}
           >
-            <RefreshCw size={18} />
+            <RefreshCw size={17} />
           </button>
         </div>
       </div>
 
-      {/* Character Card (Gamification Level, Rank, XP Bar, Streak) */}
+      {/* Character Card (Level, Rank, XP Bar, Streak) */}
       <CharacterCard character={stats?.character} />
 
-      {/* Financial Summary Cards */}
+      {/* 1-Click Quick Add Presets Bar (Fintech UX Delight!) */}
+      <div className="card" style={{ padding: '1rem 1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-white)' }}>
+            <Zap size={16} color="#fbbf24" />
+            <span>1-Click Quick Log (+20 XP):</span>
+          </div>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Tap any preset to log instantly to MySQL</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '0.75rem' }}>
+          {QUICK_PRESETS.map((preset, idx) => {
+            const Icon = preset.icon;
+            return (
+              <button
+                key={idx}
+                disabled={quickLogging}
+                onClick={() => handleQuickLog(preset)}
+                className="btn btn-secondary"
+                style={{
+                  padding: '0.55rem 0.85rem',
+                  justifyContent: 'flex-start',
+                  fontSize: '0.825rem',
+                  gap: '0.6rem',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                }}
+              >
+                <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: 'rgba(139, 92, 246, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-purple-light)' }}>
+                  <Icon size={14} />
+                </div>
+                <div style={{ textAlign: 'left', lineHeight: 1.2 }}>
+                  <div style={{ fontWeight: 600, color: 'var(--text-white)' }}>{preset.desc}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#fbbf24', fontWeight: 700 }}>₹{preset.amt}</div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Summary Metric Cards */}
       <div className="summary-grid">
         <div className="card metric-card">
           <div className="metric-header">
@@ -127,7 +206,7 @@ const Dashboard = () => {
 
         <div className="card metric-card">
           <div className="metric-header">
-            <span>Remaining Funds</span>
+            <span>Remaining Quota</span>
             <div
               className="metric-icon-box"
               style={{
@@ -147,7 +226,7 @@ const Dashboard = () => {
             {formatCurrency(stats?.remaining || 0)}
           </div>
           <div className="metric-sub">
-            {stats?.is_budget_exceeded ? 'Budget exceeded!' : 'Left to spend this month'}
+            {stats?.is_budget_exceeded ? 'Budget exceeded!' : 'Safe balance left'}
           </div>
         </div>
 
@@ -164,13 +243,13 @@ const Dashboard = () => {
 
         <div className="card metric-card">
           <div className="metric-header">
-            <span>Avg. Daily Spending</span>
+            <span>Avg. Daily Spend</span>
             <div className="metric-icon-box" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }}>
               <TrendingDown size={18} />
             </div>
           </div>
           <div className="metric-value">{formatCurrency(stats?.average_daily_spending || 0)}</div>
-          <div className="metric-sub">Per day this month</div>
+          <div className="metric-sub">Per day pace</div>
         </div>
       </div>
 
@@ -186,12 +265,12 @@ const Dashboard = () => {
       />
 
       {/* Category Breakdown & Recent Expenses Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 340px', gap: '1.5rem' }}>
-        {/* Recent Expenses */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '1.5rem' }}>
+        {/* Recent Expenses Table */}
         <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div>
-              <h3 style={{ fontSize: '1.15rem', marginBottom: '0.2rem' }}>Recent Expenses</h3>
+              <h3 style={{ fontSize: '1.15rem', marginBottom: '0.2rem' }}>Recent Ledger Entries</h3>
               <p style={{ fontSize: '0.85rem' }}>Latest financial activities</p>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -214,10 +293,10 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Category Breakdown Mini Widget */}
+        {/* Category Breakdown Widget */}
         <div className="card">
-          <h3 style={{ fontSize: '1.15rem', marginBottom: '0.2rem' }}>Category Split</h3>
-          <p style={{ fontSize: '0.85rem' }}>Monthly distribution</p>
+          <h3 style={{ fontSize: '1.15rem', marginBottom: '0.2rem' }}>Category Distribution</h3>
+          <p style={{ fontSize: '0.85rem', marginBottom: '1rem' }}>Monthly outflows by category</p>
 
           <div className="category-bars">
             {stats?.category_breakdown && stats.category_breakdown.length > 0 ? (
@@ -226,12 +305,15 @@ const Dashboard = () => {
                 return (
                   <div key={cat.category} className="cat-bar-item">
                     <div className="cat-bar-labels">
-                      <span style={{ color: 'var(--text-white)' }}>{cat.category}</span>
+                      <span style={{ color: 'var(--text-white)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: meta.color }} />
+                        {cat.category}
+                      </span>
                       <span style={{ color: 'var(--text-secondary)' }}>
                         {formatCurrency(cat.amount)} ({cat.percentage}%)
                       </span>
                     </div>
-                    <div className="progress-track" style={{ height: '6px' }}>
+                    <div className="progress-track" style={{ height: '7px' }}>
                       <div
                         style={{
                           height: '100%',
@@ -245,8 +327,8 @@ const Dashboard = () => {
                 );
               })
             ) : (
-              <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                No category data for {selectedMonth}.
+              <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                No category activity for {selectedMonth}.
               </div>
             )}
           </div>
