@@ -8,17 +8,15 @@ Prepared according to the College SOP for CRUD Web Application Development
 
 ---
 
-**Name:** ________________________________________
+**Name:** YUVASRI A
 
-**Register Number:** ________________________________________
+**Register Number:** 922525104189
 
-**Department:** ________________________________________
+**Department:** COMPUTER SCIENCE AND ENGINEERING
 
-**College:** ________________________________________
+**College:** V S B ENGINEERING COLLEGE KARUR
 
-**Academic Year:** ________________________________________
-
----
+**Academic Year:** 2025-2029
 
 ## Table of Contents
 
