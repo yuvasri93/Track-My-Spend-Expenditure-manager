@@ -4,7 +4,7 @@
 
 A modern, full-stack personal expense management platform infused with lightweight RPG gamification mechanics. Developed with **Django REST Framework**, **MySQL**, and **React**.
 
-> 📄 **College Evaluation Report**: For the complete SOP documentation, ER diagrams, testing logs, and architecture details, please see [**PROJECT_REPORT.md**](./PROJECT_REPORT.md).
+> 📄 **College Evaluation Report**: For the complete SOP documentation, ER diagrams, testing logs, and architecture details, please see [**PROJECT_REPORT.md**](./REPORT.md).
 
 ---
 
