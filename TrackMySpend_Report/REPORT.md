@@ -117,7 +117,6 @@ graph TD
     DRF <-->|Django ORM / PyMySQL| MySQL[(MySQL 8.0 Database)]
 ```
 
-> 📷 *Insert Screenshot: System Architecture Diagram*
 
 ---
 
@@ -145,7 +144,6 @@ erDiagram
     EXPENSES_ACHIEVEMENT ||--o{ EXPENSES_USERACHIEVEMENT : "awarded in"
 ```
 
-> 📷 *Insert Screenshot: Entity-Relationship (ER) Diagram*
 
 ---
 
@@ -162,11 +160,9 @@ Key layout elements:
 
 ### Login Page
 
-> 📷 *Insert Screenshot: Login Page*
 
 ### Register Page
 
-> 📷 *Insert Screenshot: Register Page*
 
 ### Dashboard — Dark Theme
 
@@ -216,9 +212,7 @@ Key layout elements:
 
 *Adventurer Dossier — account details and the global leaderboard*
 
-### Mobile / Responsive View
 
-> 📷 *Insert Screenshot: Mobile / Responsive View*
 
 ---
 
